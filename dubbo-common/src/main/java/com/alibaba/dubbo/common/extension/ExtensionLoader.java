@@ -492,12 +492,14 @@ public class ExtensionLoader<T> {
             T instance = (T) EXTENSION_INSTANCES.get(clazz);
             if (instance == null) {
                 EXTENSION_INSTANCES.putIfAbsent(clazz, clazz.newInstance());
+                //应该是利用concurrentHashMAp处理可见性问题?
                 instance = (T) EXTENSION_INSTANCES.get(clazz);
             }
             injectExtension(instance);
             Set<Class<?>> wrapperClasses = cachedWrapperClasses;
             if (wrapperClasses != null && !wrapperClasses.isEmpty()) {
                 for (Class<?> wrapperClass : wrapperClasses) {
+                    //这里完成了包装,让新特性加入原来的对象;
                     instance = injectExtension((T) wrapperClass.getConstructor(type).newInstance(instance));
                 }
             }
@@ -674,6 +676,7 @@ public class ExtensionLoader<T> {
                     throw new IllegalStateException("No such extension name for the class " + clazz.getName() + " in the config " + resourceURL);
                 }
             }
+
             String[] names = NAME_SEPARATOR.split(name);
             if (names != null && names.length > 0) {
                 Activate activate = clazz.getAnnotation(Activate.class);
@@ -832,7 +835,7 @@ public class ExtensionLoader<T> {
                     char[] charArray = type.getSimpleName().toCharArray();
                     StringBuilder sb = new StringBuilder(128);
                     for (int i = 0; i < charArray.length; i++) {
-                        if (Character.isUpperCase(charArray[i])) {
+                        if (Character.isUpperCase(charArray[i])) {//这里是把驼峰转化为类型,因为有.
                             if (i != 0) {
                                 sb.append(".");
                             }

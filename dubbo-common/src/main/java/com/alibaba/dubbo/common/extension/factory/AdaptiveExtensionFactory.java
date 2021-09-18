@@ -35,6 +35,7 @@ public class AdaptiveExtensionFactory implements ExtensionFactory {
     public AdaptiveExtensionFactory() {
         ExtensionLoader<ExtensionFactory> loader = ExtensionLoader.getExtensionLoader(ExtensionFactory.class);
         List<ExtensionFactory> list = new ArrayList<ExtensionFactory>();
+        //spi spring 因此spi前面,spring在后面...不过这个写法不敢恭维;
         for (String name : loader.getSupportedExtensions()) {
             list.add(loader.getExtension(name));
         }
